@@ -18,8 +18,8 @@ To run this project locally, follow these steps:
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/anupvjpawar/Chat-With-Your-PDFs.git
-    cd Chat-With-Your-PDFs
+    git clone https://github.com/yourusername/chat-with-multiple-pdfs.git
+    cd chat-with-multiple-pdfs
     ```
 
 2. **Create and activate a virtual environment**:
@@ -38,7 +38,7 @@ To run this project locally, follow these steps:
     ```
     OPENAI_API_KEY=your_openai_api_key_here
     ```
-
+![PDF-LangChain](docs/open_ai_api_flow.jpg)
 5. **Run the Streamlit app**:
     ```bash
     streamlit run app.py
@@ -51,7 +51,6 @@ To run this project locally, follow these steps:
 3. **Ask Questions**: Type your questions about the uploaded documents in the text input field and interact with the app.
 
 ## Project Structure
-
 
 ## Technical Details
 
