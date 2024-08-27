@@ -38,7 +38,7 @@ To run this project locally, follow these steps:
     ```
     OPENAI_API_KEY=your_openai_api_key_here
     ```
-![PDF-LangChain](docs/open_ai_api_flow.jpg)
+![LLM Flow](docs/open_ai_api_flow.jpeg)
 5. **Run the Streamlit app**:
     ```bash
     streamlit run app.py
