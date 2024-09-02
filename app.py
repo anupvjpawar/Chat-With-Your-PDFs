@@ -44,13 +44,13 @@ def get_vectorstore(text_chunks):
         
         # Encode the text chunks to get their embeddings
         embeddings = model.encode(text_chunks, show_progress_bar=True)
-        
+
+        # Convert embeddings to FAISS-compatible format
+        embeddings = np.array(embeddings)
+
         # Create the FAISS vector store with embeddings and corresponding text chunks
-        vectorstore = FAISS.from_embeddings(
-            embeddings=embeddings, 
-            texts=text_chunks,
-            dimension=embeddings.shape[1]
-        )
+        vectorstore = FAISS.from_texts(texts=text_chunks, embeddings=embeddings)
+
         return vectorstore
     except Exception as e:
         st.error(f"Error creating vector store: {e}")
