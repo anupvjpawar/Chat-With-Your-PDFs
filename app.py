@@ -10,8 +10,6 @@ from htmlTemplates import css, bot_template, user_template
 import numpy as np
 
 # Function to extract text from PDFs
-def get_pdf_text(pdf_docs):
-
 def get_pdf_text(file):
     text = ""
     try:
