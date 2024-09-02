@@ -34,9 +34,22 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
-# Function to create a FAISS vector store
-from langchain_community.vectorstores import FAISS
+# Function to create a FAISimport numpy as np
 import faiss
+from langchain_community.vectorstores import FAISS
+
+class CustomFAISS:
+    def __init__(self, dimension):
+        self.index = faiss.IndexFlatL2(dimension)
+        self.texts = []
+
+    def add_texts(self, texts, embeddings):
+        self.index.add(embeddings)
+        self.texts.extend(texts)
+    
+    def as_retriever(self):
+        # Implement as needed for your use case
+        pass
 
 # Function to create a FAISS vector store
 def get_vectorstore(text_chunks):
@@ -50,17 +63,14 @@ def get_vectorstore(text_chunks):
         # Convert embeddings to a NumPy array
         embeddings = np.array(embeddings).astype(np.float32)
 
-        # Create a FAISS index
+        # Create a custom FAISS index
         dimension = embeddings.shape[1]
-        index = faiss.IndexFlatL2(dimension)
+        custom_faiss = CustomFAISS(dimension)
         
-        # Add embeddings to the FAISS index
-        index.add(embeddings)
+        # Add embeddings and texts
+        custom_faiss.add_texts(text_chunks, embeddings)
 
-        # Create a FAISS vector store
-        vectorstore = FAISS(index=index, texts=text_chunks)
-
-        return vectorstore
+        return custom_faiss
     except Exception as e:
         st.error(f"Error creating vector store: {e}")
         return None
