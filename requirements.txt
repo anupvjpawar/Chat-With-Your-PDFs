@@ -9,7 +9,7 @@ tiktoken
 sentence-transformers
 langchain
 numpy
-
+langchain-community
 
 # uncomment to use huggingface llms
 # huggingface-hub==0.14.1
