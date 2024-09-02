@@ -33,6 +33,9 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
+from langchain_community.vectorstores import FAISS
+from sentence_transformers import SentenceTransformer
+
 # Function to create a FAISS vector store
 def get_vectorstore(text_chunks):
     try:
@@ -43,7 +46,11 @@ def get_vectorstore(text_chunks):
         embeddings = model.encode(text_chunks, show_progress_bar=True)
         
         # Create the FAISS vector store with embeddings and corresponding text chunks
-        vectorstore = FAISS.from_embeddings(embeddings=embeddings, texts=text_chunks)
+        vectorstore = FAISS.from_embeddings(
+            embeddings=embeddings, 
+            texts=text_chunks,
+            dimension=embeddings.shape[1]
+        )
         return vectorstore
     except Exception as e:
         st.error(f"Error creating vector store: {e}")
