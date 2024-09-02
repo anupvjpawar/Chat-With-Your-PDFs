@@ -34,7 +34,8 @@ def get_text_chunks(text):
     return chunks
 
 from langchain.vectorstores import FAISS
-from langchain.embeddings import FAISS_ID
+from sentence_transformers import SentenceTransformer
+import numpy as np
 
 # Function to create a FAISS vector store
 def get_vectorstore(text_chunks):
@@ -42,12 +43,16 @@ def get_vectorstore(text_chunks):
         model = SentenceTransformer('all-MiniLM-L6-v2')
         embeddings = model.encode(text_chunks, show_progress_bar=True)
 
-        # Create FAISS vector store with embeddings and corresponding text chunks
-        vectorstore = FAISS.from_embeddings(embeddings, text_chunks)
+        # FAISS requires embeddings as a numpy array
+        embeddings = np.array(embeddings)
+
+        # Create the FAISS vector store with embeddings and corresponding text chunks
+        vectorstore = FAISS.from_texts(text_chunks, model)
         return vectorstore
     except Exception as e:
         st.error(f"Error creating vector store: {e}")
         return None
+
 
 # Function to create a conversational retrieval chain
 def get_conversation_chain(vectorstore):
