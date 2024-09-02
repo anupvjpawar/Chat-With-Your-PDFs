@@ -77,20 +77,32 @@ def get_vectorstore(text_chunks):
 
 
 # Function to create a conversational retrieval chain
-def get_conversation_chain(vectorstore):
-    tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-    model = GPT2LMHeadModel.from_pretrained("gpt2")
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
+class CustomGPT2:
+    def __init__(self):
+        self.tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+        self.model = GPT2LMHeadModel.from_pretrained("gpt2")
+
+    def __call__(self, input_text):
+        inputs = self.tokenizer.encode(input_text, return_tensors='pt')
+        outputs = self.model.generate(inputs, max_length=150, num_return_sequences=1)
+        return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+def get_conversation_chain(vectorstore):
+    model = CustomGPT2()
+    
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True)
 
-    # Custom conversation chain using local GPT-2 model
-    conversation_chain = ConversationalRetrievalChain.from_llm(
-        llm=lambda input_text: generate_response(input_text, tokenizer, model),
+    # Custom conversation chain
+    conversation_chain = ConversationalRetrievalChain(
         retriever=vectorstore.as_retriever(),
-        memory=memory
+        memory=memory,
+        llm=model
     )
     return conversation_chain
+
 
 # Function to generate a response using GPT-2
 def generate_response(input_text, tokenizer, model):
