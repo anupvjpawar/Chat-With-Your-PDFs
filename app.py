@@ -11,11 +11,17 @@ import numpy as np
 
 # Function to extract text from PDFs
 def get_pdf_text(pdf_docs):
+
+def get_pdf_text(file):
     text = ""
-    for pdf in pdf_docs:
-        pdf_reader = PdfReader(pdf)
-        for page in pdf_reader.pages:
-            text += page.extract_text()
+    try:
+        for pdf in pdf_docs:
+            pdf_reader = PdfReader(pdf)
+            for page in pdf_reader.pages:
+                text += page.extract_text()
+        pass
+    except Exception as e:
+        st.error(f"Error processing PDF: {e}")
     return text
 
 # Function to split text into chunks
@@ -33,10 +39,15 @@ def get_text_chunks(text):
 
 # Function to create a FAISS vector store
 def get_vectorstore(text_chunks):
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    embeddings = np.array([model.encode(chunk) for chunk in text_chunks])
-    vectorstore = FAISS.from_embeddings(embeddings)
-    return vectorstore
+    try:
+        model = SentenceTransformer('all-MiniLM-L6-v2')
+        embeddings = np.array([model.encode(chunk) for chunk in text_chunks])
+        vectorstore = FAISS.from_embeddings(embeddings)
+        return vectorstore
+         pass
+    except Exception as e:
+        st.error(f"Error creating vector store: {e}")
+        
 
 # Function to create a conversational retrieval chain
 def get_conversation_chain(vectorstore):
