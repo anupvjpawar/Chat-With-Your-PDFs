@@ -88,20 +88,25 @@ class CustomGPT2:
         inputs = self.tokenizer.encode(input_text, return_tensors='pt')
         outputs = self.model.generate(inputs, max_length=150, num_return_sequences=1)
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+from langchain.chains import ConversationalRetrievalChain
+from langchain.llms import GPT2
+from langchain.memory import ConversationBufferMemory
 
 def get_conversation_chain(vectorstore):
-    model = CustomGPT2()
+    # Initialize the GPT-2 model as a Runnable
+    model = GPT2.from_pretrained("gpt2")
     
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True)
 
-    # Custom conversation chain
+    # Create a custom ConversationalRetrievalChain
     conversation_chain = ConversationalRetrievalChain(
         retriever=vectorstore.as_retriever(),
         memory=memory,
         llm=model
     )
     return conversation_chain
+
 
 
 # Function to generate a response using GPT-2
