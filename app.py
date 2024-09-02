@@ -10,14 +10,13 @@ from htmlTemplates import css, bot_template, user_template
 import numpy as np
 
 # Function to extract text from PDFs
-def get_pdf_text(file):
+def get_pdf_text(pdf_docs):
     text = ""
     try:
         for pdf in pdf_docs:
             pdf_reader = PdfReader(pdf)
             for page in pdf_reader.pages:
                 text += page.extract_text()
-        pass
     except Exception as e:
         st.error(f"Error processing PDF: {e}")
     return text
@@ -40,12 +39,11 @@ def get_vectorstore(text_chunks):
     try:
         model = SentenceTransformer('all-MiniLM-L6-v2')
         embeddings = np.array([model.encode(chunk) for chunk in text_chunks])
-        vectorstore = FAISS.from_embeddings(embeddings)
+        vectorstore = FAISS.from_embeddings(text_chunks, embeddings)
         return vectorstore
-        pass
     except Exception as e:
         st.error(f"Error creating vector store: {e}")
-        
+        return None
 
 # Function to create a conversational retrieval chain
 def get_conversation_chain(vectorstore):
@@ -87,7 +85,10 @@ def main():
     st.header("Chat with multiple PDFs :books:")
     user_question = st.text_input("Ask a question about your documents:")
     if user_question:
-        handle_userinput(user_question)
+        if st.session_state.conversation:
+            handle_userinput(user_question)
+        else:
+            st.error("Please process the PDFs before asking questions.")
         
     st.image("docs/PDF-LangChain.jpg", use_column_width=True) 
     
@@ -98,18 +99,25 @@ def main():
         pdf_docs = st.file_uploader(
             "Upload your PDFs here and click on 'Process'", accept_multiple_files=True)
         if st.button("Process"):
-            with st.spinner("Processing"):
-                # get pdf text
-                raw_text = get_pdf_text(pdf_docs)
+            if pdf_docs:
+                with st.spinner("Processing"):
+                    # get pdf text
+                    raw_text = get_pdf_text(pdf_docs)
 
-                # get the text chunks
-                text_chunks = get_text_chunks(raw_text)
+                    # get the text chunks
+                    text_chunks = get_text_chunks(raw_text)
 
-                # create vector store
-                vectorstore = get_vectorstore(text_chunks)
+                    # create vector store
+                    vectorstore = get_vectorstore(text_chunks)
 
-                # create conversation chain
-                st.session_state.conversation = get_conversation_chain(vectorstore)
+                    # Ensure the vectorstore is created before proceeding
+                    if vectorstore:
+                        # create conversation chain
+                        st.session_state.conversation = get_conversation_chain(vectorstore)
+                    else:
+                        st.error("Failed to create vector store.")
+            else:
+                st.error("Please upload at least one PDF.")
         
         # Add LinkedIn hyperlink
         st.sidebar.markdown("---")
