@@ -40,12 +40,12 @@ import numpy as np
 # Function to create a FAISS vector store
 def get_vectorstore(text_chunks):
     try:
+        # Load the sentence transformer model
         model = SentenceTransformer('all-MiniLM-L6-v2')
+        
+        # Encode the text chunks to get their embeddings
         embeddings = model.encode(text_chunks, show_progress_bar=True)
-
-        # FAISS requires embeddings as a numpy array
-        embeddings = np.array(embeddings)
-
+        
         # Create the FAISS vector store with embeddings and corresponding text chunks
         vectorstore = FAISS.from_texts(text_chunks, model)
         return vectorstore
