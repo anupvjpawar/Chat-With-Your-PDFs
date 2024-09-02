@@ -8,6 +8,7 @@ from langchain.memory import ConversationBufferMemory
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from htmlTemplates import css, bot_template, user_template
 import numpy as np
+
 # Function to extract text from PDFs
 def get_pdf_text(pdf_docs):
     text = ""
@@ -33,9 +34,6 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
-from langchain_community.vectorstores import FAISS
-from sentence_transformers import SentenceTransformer
-
 # Function to create a FAISS vector store
 def get_vectorstore(text_chunks):
     try:
@@ -44,13 +42,13 @@ def get_vectorstore(text_chunks):
         
         # Encode the text chunks to get their embeddings
         embeddings = model.encode(text_chunks, show_progress_bar=True)
-
+        
         # Convert embeddings to FAISS-compatible format
         embeddings = np.array(embeddings)
 
-        # Create the FAISS vector store with embeddings and corresponding text chunks
+        # Create the FAISS vector store with texts and embeddings
         vectorstore = FAISS.from_texts(texts=text_chunks, embeddings=embeddings)
-
+        
         return vectorstore
     except Exception as e:
         st.error(f"Error creating vector store: {e}")
