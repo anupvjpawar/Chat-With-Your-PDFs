@@ -82,7 +82,7 @@ def main():
         
     st.image("docs/PDF-LangChain.jpg", use_column_width=True) 
     
-    st.image("docs/open_ai_api_flow.jpeg, use_column_width=True)
+    st.image("docs/open_ai_api_flow.jpeg", use_column_width=True)
     
     with st.sidebar:
         st.subheader("Your documents")
