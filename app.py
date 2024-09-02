@@ -7,7 +7,6 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain.chat_models import ChatOpenAI
 from htmlTemplates import css, bot_template, user_template
-import numpy as np
 
 # Function to extract text from PDFs
 def get_pdf_text(pdf_docs):
@@ -38,8 +37,8 @@ def get_text_chunks(text):
 def get_vectorstore(text_chunks):
     try:
         model = SentenceTransformer('all-MiniLM-L6-v2')
-        embeddings = np.array([model.encode(chunk) for chunk in text_chunks])
-        vectorstore = FAISS.from_embeddings(text_chunks, embeddings)
+        embeddings = model.encode(text_chunks, show_progress_bar=True)
+        vectorstore = FAISS.from_embeddings(embeddings)
         return vectorstore
     except Exception as e:
         st.error(f"Error creating vector store: {e}")
