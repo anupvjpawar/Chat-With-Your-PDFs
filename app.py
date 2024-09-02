@@ -42,7 +42,7 @@ def get_vectorstore(text_chunks):
         embeddings = np.array([model.encode(chunk) for chunk in text_chunks])
         vectorstore = FAISS.from_embeddings(embeddings)
         return vectorstore
-         pass
+        pass
     except Exception as e:
         st.error(f"Error creating vector store: {e}")
         
