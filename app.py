@@ -2,10 +2,10 @@ import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from sentence_transformers import SentenceTransformer
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-from langchain.chat_models import ChatOpenAI
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from htmlTemplates import css, bot_template, user_template
 
 # Function to extract text from PDFs
@@ -33,9 +33,6 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
-from langchain_community.vectorstores import FAISS
-from sentence_transformers import SentenceTransformer
-
 # Function to create a FAISS vector store
 def get_vectorstore(text_chunks):
     try:
@@ -52,20 +49,27 @@ def get_vectorstore(text_chunks):
         st.error(f"Error creating vector store: {e}")
         return None
 
-
-
 # Function to create a conversational retrieval chain
 def get_conversation_chain(vectorstore):
-    llm = ChatOpenAI()
+    tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+    model = GPT2LMHeadModel.from_pretrained("gpt2")
 
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True)
+
+    # Custom conversation chain using local GPT-2 model
     conversation_chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
+        llm=lambda input_text: generate_response(input_text, tokenizer, model),
         retriever=vectorstore.as_retriever(),
         memory=memory
     )
     return conversation_chain
+
+# Function to generate a response using GPT-2
+def generate_response(input_text, tokenizer, model):
+    inputs = tokenizer.encode(input_text, return_tensors='pt')
+    outputs = model.generate(inputs, max_length=150, num_return_sequences=1)
+    return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 # Function to handle user input
 def handle_userinput(user_question):
