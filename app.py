@@ -7,7 +7,7 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from htmlTemplates import css, bot_template, user_template
-
+import numpy as np
 # Function to extract text from PDFs
 def get_pdf_text(pdf_docs):
     text = ""
